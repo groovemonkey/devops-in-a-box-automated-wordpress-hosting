@@ -3,6 +3,8 @@ from fabric.api import run, sudo, put, prompt, cd, env, get, task
 from fabric.operations import local as lrun
 from fabric.contrib.files import append
 import os
+import googleapiclient
+
 
 
 @task
@@ -10,6 +12,10 @@ def create_instance():
     """Spin up compute instance from base image."""
     env.run = lrun
     env.hosts = ['localhost']
+
+    # Initialize
+    compute = googleapiclient.discovery.build('compute', 'v1')
+
 
 
 # @task

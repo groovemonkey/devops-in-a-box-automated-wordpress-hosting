@@ -1,4 +1,6 @@
-
+###################
+# MOVE TO FABFILE #
+###################
 
 def create_instance(compute, project, zone, name, machinetype="n1-standard-1", source_disk_image="", metadata):
     """
