@@ -51,7 +51,9 @@ Docs: [Setting up Authentication](https://cloud.google.com/docs/authentication/p
 2. Click "Create Service Account"
 
 Service Account Name: wpautomation
-Roles: Compute Engine --> Compute Admin
+Roles:
+    - Compute Engine --> Compute Admin
+    - Service Accounts --> Service Account User
 Furnish a new private key --> JSON
 
 Download and save the generated key to ~/$PROJECTROOT/keys/
