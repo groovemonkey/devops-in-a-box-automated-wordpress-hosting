@@ -37,3 +37,25 @@ In the shell, continue the initialization process.
 
 
 Congratulations, you have CLI access to your Google Cloud project!
+
+
+## Set up a service account for our scripts
+
+Let's set up a service account for our automation code to use.
+
+Docs: [Application Default Credentials](https://developers.google.com/accounts/docs/application-default-credentials)
+
+Docs: [Setting up Authentication](https://cloud.google.com/docs/authentication/production)
+
+1. In the GCP web interface (console), navigate to "IAM & Admin" --> "Service accounts"
+2. Click "Create Service Account"
+
+Service Account Name: wpautomation
+Roles: Compute Engine --> Compute Admin
+Furnish a new private key --> JSON
+
+Download and save the generated key to ~/$PROJECTROOT/keys/
+
+
+
+

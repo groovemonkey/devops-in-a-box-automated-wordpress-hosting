@@ -25,11 +25,31 @@ You may need to wait 30 seconds and re-run the gcloud command if you just create
 
 
 
+## Configure Your Instance
+
+See the scripts/install-wordpress-hosting-base.sh file for step-by-step instructions (or just run that file).
+
+When you're done, shut down your compute instance.
 
 
 
+## Create a custom image from your instance.
+
+### In the Cloud Console
+
+Navigate to "Compute Engine" --> "Images" --> "Create an Image"
+
+Name: master-image-v0
+Family: wordpress-base
+Desc: A basic debian 9 image for testing.
+Source Disk: master-instance
+
+Click "Create."
 
 
+### In cloud shell (gcloud)
+
+    gcloud compute --project=scenic-handler-180616 images create master-image-v0 --description=A\ basic\ debian\ 9\ image\ for\ testing. --family=wordpress-base --source-disk=master-instance --source-disk-zone=us-central1-c
 
 
 

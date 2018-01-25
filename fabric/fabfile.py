@@ -141,6 +141,9 @@ def delete_instance(project, zone, name):
     """
     Delete a compute instance.
     """
+    env.run = lrun
+    env.hosts = ['localhost']
+    
     # Initialize
     compute = googleapiclient.discovery.build('compute', 'v1')
 
