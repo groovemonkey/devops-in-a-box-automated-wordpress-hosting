@@ -3,15 +3,15 @@
 
 ## Dave's TODO
 
-# finish 'master instance' setup
-# create disk image
-# create a (.gitignore'd) config file for mysql login info, admin SSH keys (?), other sensitive data
-# flesh out admin tasks in fabfile
+1. finish 'master instance' setup
+1. create disk image
+1. create a (.gitignore'd) config file for mysql login info, admin SSH keys (?), other sensitive data
+1. flesh out admin tasks in fabfile
     - create_instance function (import/transplant all code from helpers.py)
     - wp-config.php templating function
     - new instance setup script -- install and configure a single WP site -- scripts/set-up-wp-site.sh (pass it in as a startup script with metadata? Or trigger configuration via fabric? Not sure yet.)
 
-# create mysql master (Google-managed)
+1. create mysql master (Google-managed)
 
 
 
