@@ -1,6 +1,14 @@
 # Functions that might be useful for fab tasks
 
 import subprocess
+import re
+
+
+
+def clean_domain(domain):
+    # TODO: Implement this in a serious way
+    re.sub("\.","-", domain)
+    return domain
 
 
 def create_wp_config_string(WPSite):

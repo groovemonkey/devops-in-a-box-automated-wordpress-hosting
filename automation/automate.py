@@ -3,34 +3,36 @@ import os
 import digitalocean
 from googleapiclient import discovery
 import helpers
-
+from WPSite import WPSite
 from custom_ansible import TL_Ansible_Playbook
-import pdb
+import argparse
+
 
 DO_TOKEN = os.environ['DO_TOKEN']
 
 
-def create_new_wp_site(domain):
+def create_new_wp_site(wpsite):
     """
     Create a new wordpress site, using digitalocean for testing.
+    Takes a WPSite object and provisions a WordPress site on a new host.
     """
     ## DIGITAL OCEAN
     newhost = create_digitalocean_instance()
 
     # Add a tag to the instance, e.g. tutorialinux.com
-    tag_digitalocean_instance(newhost, domain)
-
+    tag_digitalocean_instance(newhost, wpsite.domain)
 
     ## ANSIBLE
     inventory_file = "TODO-mktemp-and-add-newhost.ip"
     dbvars = {
-        'user': dbuser,
-        'password': dbpassword,
-        'database': dbname,
-        'dbhost': dbhost
+        'user': wpsite.dbuser,
+        'password': wpsite.dbpassword,
+        'database': wpsite.dbname,
+        'dbhost': wpsite.dbhost
     }
     pb_mysql_setup = TL_Ansible_Playbook(playbook_path="ansible/mysql_new_site.yml", host_list=newhost, inventory_file=inventory_file, extravars=dbvars)
-    pass
+    mysql_success = pb_mysql_setup.run()
+    return mysql_success
 
 
 def tag_digitalocean_instance(droplet, tag):
@@ -74,9 +76,6 @@ def list_digitalocean_instances():
 def create_google_instance(project, zone, region, name, machinetype="n1-standard-1", serviceacct_email="default", metadata={}):
     """
     Create a compute instance in the supplied project/zone, using the supplied
-    machine type
-    disk image
-    metadata
 
     ## If we want to use a startup script to write nginx configs and set up the website
     # Is this run on each boot, or just on first startup during provisioning?
@@ -238,4 +237,39 @@ def delete_instance(project, zone, name):
         project=project,
         zone=zone,
         instance=name).execute()
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("command", help="command you want to run, e.g. add-site")
+    parser.add_argument("--domain", help="domain for the new site")
+    parser.add_argument("--dbname")
+    parser.add_argument("--dbuser")
+    parser.add_argument("--dbpass")
+    parser.add_argument("--dbhost")
+    # parser.add_argument("--cloud")
+    parser.parse_args()
+
+    # Have we implemented this command?
+    if args.command not in ["add-site", "addsite"]:
+        print("Command not implemented.")
+        sys.exit()
+
+    if args.command == "add-site":
+        if not args.domain and args.dbname and args.dbuser and args.dbpass and args.dbhost and args.webhost and args.ip and args.cloud:
+            print("Missing required argument. Please check your command and try again.")
+            sys.exit()
+
+        # Good to go -- create WPSite object
+        domain = clean_domain(domain)
+        wpsite = WPSite(dbhost=dbhost, dbname=dbname, dbuser=dbuser, dbpass=dbpass, domain=domain)
+        create_new_wp_site(wpsite)
+
+        # Print details of created machine/site -- TODO: make this much nicer
+        print("New website has been created. Please remember the following details:\n")
+        print(wpsite.__dict__)
+
+
+if __name__ == '__main__':
+    main()
 

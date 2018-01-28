@@ -5,14 +5,20 @@
 
 1. Finish/test 'master instance' setup script (install-wordpress-hosting-base.sh)
 1. Create a DO 'master' wp hosting image
-1. "I want a new site" --> create WPSite object --> automate.py/create_new_wp_site()
-1. Get the ansible test playbook working (called from automate.py)
-1. flesh out admin tasks in automation code
-    - MOVE TO ANSIBLE? wp-config.php template function (helpers.py)
-    - new instance setup script -- install and configure a single WP site -- scripts/set-up-wp-site.sh (pass it in as a startup script with metadata)
-
 1. create DigitalOcean MySQL master
+1. Get the ansible test playbook working (called from automate.py)
+1. automate.py --> implement "TODO-mktemp-and-add-newhost.ip"
+1. flesh out admin tasks in automation code
+    - move wp-config.php template creation from helpers.py to ansible
+    - new instance setup script -- install and configure a single WP site -- scripts/set-up-wp-site.sh (pass it in as a startup script -- GCP-metadata or the analogous DO/AWS operation)
+
 1. create GCP MySQL master
+
+
+### DONE
+
+- "I want a new site" --> create WPSite object --> automate.py/create_new_wp_site()
+
 
 
 ## Filming plan:
