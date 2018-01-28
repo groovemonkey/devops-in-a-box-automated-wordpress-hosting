@@ -3,16 +3,16 @@
 
 ## Dave's TODO
 
-1. finish 'master instance' setup
-1. create disk image
-1. create a (.gitignore'd) config file for mysql login info, admin SSH keys (?), other sensitive data
-1. flesh out admin tasks in fabfile
-    - create_instance function (import/transplant all code from helpers.py)
-    - wp-config.php templating function
-    - new instance setup script -- install and configure a single WP site -- scripts/set-up-wp-site.sh (pass it in as a startup script with metadata? Or trigger configuration via fabric? Not sure yet.)
+1. Finish/test 'master instance' setup script (install-wordpress-hosting-base.sh)
+1. Create a DO 'master' wp hosting image
+1. "I want a new site" --> create WPSite object --> automate.py/create_new_wp_site()
+1. Get the ansible test playbook working (called from automate.py)
+1. flesh out admin tasks in automation code
+    - MOVE TO ANSIBLE? wp-config.php template function (helpers.py)
+    - new instance setup script -- install and configure a single WP site -- scripts/set-up-wp-site.sh (pass it in as a startup script with metadata)
 
-1. create mysql master (Google-managed)
-
+1. create DigitalOcean MySQL master
+1. create GCP MySQL master
 
 
 ## Filming plan:
@@ -29,12 +29,19 @@
 
 These automation tasks map directly to implementation-specific concepts. They form the foundation for higher-level automation functions.
 
-- Spin up compute instance from base image
 - Create a site DB user on the cluster
+- Enable/Disable site (nginx stop)
 - Create a wp-config.php file from site metadata (hostname, mysql auth/endpoint info, etc.)
-- list active sites
 - backup mysql db
 - backup wp files
+- update mysql credentials in wp-config.php
+
+
+#### DONE
+
+- list active sites
+- Spin up compute instance from base image
+
 
 
 ### High-level automation
@@ -42,7 +49,6 @@ These automation tasks map directly to implementation-specific concepts. They fo
 These automation functions map directly to the BUSINESS GOALS that our application carries out. They are composed of low-level, implementation-hiding functions. These high-level automation functions are called directly by our management scripts and fab tasks.
 
 - Create new site (spin up base image, create site DB user, create a wp-config.php file)
-- Enable/Disable site (nginx stop)
 - Update mysql endpoint for a site
 - Back up site (list active sites, backup mysql db, backup wp files)
 - Restore site
@@ -51,6 +57,7 @@ These automation functions map directly to the BUSINESS GOALS that our applicati
 
 ### Extra Features (explain feature/complexity tradeoffs at the end)
 
+- Caching? CDN?
 - create and store letsencrypt TLS cert for a domain
 - use TLS cert (nginx)
 
@@ -87,8 +94,12 @@ These automation functions map directly to the BUSINESS GOALS that our applicati
 
 ## HOWTO
 
-    virtualenv venv
+    # Create a Python virtual environment for this project and install dependencies
+    cd $THIS_DIRECTORY
+    python3 -m venv venv
     source venv/bin/activate
     pip install -r requirements.txt
+
+    cd fabfile
 
 

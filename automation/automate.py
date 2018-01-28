@@ -1,15 +1,77 @@
-# Fabfile for common administration tasks
-from fabric.api import run, sudo, put, prompt, cd, env, get, task
-from fabric.operations import local as lrun
-from fabric.contrib.files import append
+# Common administration tasks
 import os
+import digitalocean
 from googleapiclient import discovery
+import helpers
+
+from custom_ansible import TL_Ansible_Playbook
 import pdb
 
+DO_TOKEN = os.environ['DO_TOKEN']
 
 
-@task
-def create_instance(project, zone, region, name, machinetype="n1-standard-1", serviceacct_email="default", metadata={}):
+def create_new_wp_site(domain):
+    """
+    Create a new wordpress site, using digitalocean for testing.
+    """
+    ## DIGITAL OCEAN
+    newhost = create_digitalocean_instance()
+
+    # Add a tag to the instance, e.g. tutorialinux.com
+    tag_digitalocean_instance(newhost, domain)
+
+
+    ## ANSIBLE
+    inventory_file = "TODO-mktemp-and-add-newhost.ip"
+    dbvars = {
+        'user': dbuser,
+        'password': dbpassword,
+        'database': dbname,
+        'dbhost': dbhost
+    }
+    pb_mysql_setup = TL_Ansible_Playbook(playbook_path="ansible/mysql_new_site.yml", host_list=newhost, inventory_file=inventory_file, extravars=dbvars)
+    pass
+
+
+def tag_digitalocean_instance(droplet, tag):
+    tag = digitalocean.Tag(token=DO_TOKEN, name=tag)
+    tag.create() # create tag if not already created
+    tag.add_droplets(droplet.id)
+
+
+def create_digitalocean_instance():
+    """
+    Create a new DO droplet. Once the droplet is provisioned, return a droplet IP.
+    """
+    droplet = digitalocean.Droplet(token="secretspecialuniquesnowflake",
+                                   name='Example',
+                                   region='nyc2',
+                                   image='debian-9-x64', # Debian 9.3
+                                   size_slug='512mb',  # or '1gb'?
+                                   backups=True)
+    droplet.create()
+
+    # Wait for provisioning to complete
+    actions = droplet.get_actions()
+    for action in actions:
+        action.load()
+        # Once it shows complete, droplet is up and running
+        print(action.status)
+
+    return droplet.ip_address
+
+
+def list_digitalocean_instances():
+    manager = digitalocean.Manager(token=DO_TOKEN)
+    my_droplets = manager.get_all_droplets()
+
+    for drop in my_droplets:
+        print(helpers.pretty_print_droplet_data(drop))
+    
+    return my_droplets
+
+
+def create_google_instance(project, zone, region, name, machinetype="n1-standard-1", serviceacct_email="default", metadata={}):
     """
     Create a compute instance in the supplied project/zone, using the supplied
     machine type
@@ -31,9 +93,6 @@ def create_instance(project, zone, region, name, machinetype="n1-standard-1", se
         }]
     }
     """
-    env.run = lrun
-    env.hosts = ['localhost']
-
     # Initialize
     compute = discovery.build('compute', 'v1')
 
@@ -112,12 +171,10 @@ def create_instance(project, zone, region, name, machinetype="n1-standard-1", se
     }
 
     success = compute.instances().insert(project=project, zone=zone, body=config).execute()
-    print success
-    return
+    return success
 
 
-# @task
-# def create_site_db(dbname):
+# # def create_site_db(dbname):
 #     """Create a DB user on the cluster."""
 #     env.run = lrun
 #     env.hosts = ['localhost']
@@ -128,68 +185,52 @@ def create_instance(project, zone, region, name, machinetype="n1-standard-1", se
 #     pass
 
 
-@task
 def create_site_user(dbname, dbuser, dbpassword):
     """Create a site DB and a DB user on the cluster."""
-    env.run = lrun
-    env.hosts = ['localhost']
     # TODO: check if this user already exists?
     # Create the user
-    run('mysql -h %s -u %s -p%s -e "CREATE DATABASE %s; GRANT ALL PRIVILEGES ON %s.* TO %s@localhost IDENTIFIED BY %s; FLUSH PRIVILEGES;"' %
-            (DB_HOST, DB_USER, DB_PASSWORD, dbname, dbname, dbuser, dbpassword))
+    # run('mysql -h %s -u %s -p%s -e "CREATE DATABASE %s; GRANT ALL PRIVILEGES ON %s.* TO %s@localhost IDENTIFIED BY %s; FLUSH PRIVILEGES;"' %
+    #         (DB_HOST, DB_USER, DB_PASSWORD, dbname, dbname, dbuser, dbpassword))
     pass
 
 
-@task
-def list_instances(project, zone):
+def list_google_instances(project, zone):
     """
     TODO: this does not work currently, even though it's taken from the docs
     here: https://cloud.google.com/compute/docs/tutorials/python-guide
     """
-    env.run = lrun
-    env.hosts = ['localhost']
-
     # Initialize
     compute = discovery.build('compute', 'v1')
     result = compute.instances().list(project=project, zone=zone).execute()
-    pdb.set_trace()
     print(result)
 
     return result['items']
 
 
-@task
 def create_wp_config():
     """Create a wp-config.php file from site metadata (hostname, mysql auth/endpoint info, etc.)."""
     pass
 
 
-@task
 def list_active_sites():
     """List active sites."""
     pass
 
 
-@task
 def backup_site_db():
     """Back up mysql DB."""
     pass
 
 
-@task
 def backup_site_files():
     """Back up WordPress site files."""
     pass
 
 
-@task
 def delete_instance(project, zone, name):
     """
     Delete a compute instance.
     """
-    env.run = lrun
-    env.hosts = ['localhost']
-
     # Initialize
     compute = googleapiclient.discovery.build('compute', 'v1')
 

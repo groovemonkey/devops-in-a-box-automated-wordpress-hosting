@@ -1,0 +1,18 @@
+---
+
+- hosts: "{{ dbhost }}"
+
+  tasks:
+    - name: Create a database for the new site
+      mysql_db:
+        name: "{{ database }}"
+        state: present
+      register: database_creation
+
+    - name: Create database user for new site
+      mysql_user:
+        name: "{{ user }}"
+        password: "{{ password }}"
+        priv: "{{ database }}.*:ALL"
+        state: present
+      when: database_creation.changed

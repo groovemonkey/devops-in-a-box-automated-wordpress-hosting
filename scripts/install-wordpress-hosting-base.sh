@@ -265,5 +265,3 @@ EOF
 # Restart php-fpm
 systemctl restart php7.0-fpm
 
-
-

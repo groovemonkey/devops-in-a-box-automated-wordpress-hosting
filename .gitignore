@@ -1,4 +1,6 @@
 *.pyc
 venv
-keys/*json
+keys/*
 _dev
+__pycache__
+
