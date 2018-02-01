@@ -1,0 +1,4 @@
+---
+
+wordpress_system_user: wpuser
+wordpress_install_directory: "/home/{{ wordpress_system_user }}/public_html"

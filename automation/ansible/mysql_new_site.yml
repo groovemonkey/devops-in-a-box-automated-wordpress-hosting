@@ -16,3 +16,15 @@
         priv: "{{ database }}.*:ALL"
         state: present
       when: database_creation.changed
+
+    - name: Create wp-config.php
+      template:
+        src: templates/wp-config.php.j2
+        dest: "{{ wordpress_install_directory }}/wp-config.php"
+        owner: wpuser
+        group: wpuser
+        mode: 0600
+
+
+
+

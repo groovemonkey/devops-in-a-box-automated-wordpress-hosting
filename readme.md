@@ -5,6 +5,7 @@
 
 1. Finish/test 'master instance' setup script (install-wordpress-hosting-base.sh)
 1. Create a DO 'master' wp hosting image
+1. Decide on default SYSTEM user/wp location/etc.
 1. create DigitalOcean MySQL master
 1. Get the ansible test playbook working (called from automate.py)
 1. automate.py --> implement "TODO-mktemp-and-add-newhost.ip"
